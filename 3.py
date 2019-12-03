@@ -1,3 +1,6 @@
+import pdb
+
+
 class MyComputer():
     def __init__(self):
         self.opcodes = {
@@ -6,9 +9,10 @@ class MyComputer():
                 2: self.mult_
                 }
 
-    def compute(self, arr):
+    def compute(self, my_arr):
         position = 0
         to_exit = False
+        arr = my_arr.copy()
         while not to_exit:
             opcode = arr[position]
             to_exit = self.opcodes[opcode](arr, position)
@@ -38,10 +42,15 @@ def main():
         prog = f.read().split(',')
         for elem in prog:
             arr.append(int(elem))
-    arr[1] = 12
-    arr[2] = 2
+    res = 19690720
     mycomp = MyComputer()
-    print(mycomp.compute(arr)[0])
+    for i in range(100):
+        for j in range(100):
+            arr[1] = i
+            arr[2] = j
+            my_res = mycomp.compute(arr)[0]
+            if my_res == res:
+                print(100*i + 76)
 
 if __name__ == '__main__':
     main()
