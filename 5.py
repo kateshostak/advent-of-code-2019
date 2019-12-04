@@ -14,34 +14,33 @@ class Wire():
             line1 = [self.wire[i], self.wire[i+1]]
             for j in range(len(wire) - 1):
                 line2 = [wire[j], wire[j+1]]
-                self.cross_lines(line1, line2, cross_points)
+                line_position = self.check_line_position(line1, line2)
+                if line_position == 1:
+                    self.cross_lines(line1, line2, cross_points)
+                elif line_position == 2:
+                    self.cross_lines(line2, line1, cross_points)
         return cross_points
 
-    def cross_lines(self, line1, line2, cross_points):
+    def check_line_position(self, line1, line2):
         if line1[0][1] == line1[1][1] and line2[0][0] == line2[1][0]:
-            line1_start_x = min(line1[0][0], line1[1][0])
-            line1_end_x = max(line1[0][0], line1[1][0])
-            line1_y = line1[0][1]
-
-            line2_x = line2[0][0]
-            line2_start_y = min(line2[0][1], line2[1][1])
-            line2_end_y = max(line2[0][1], line2[1][1])
-
-            if line2_x in range(line1_start_x, line1_end_x + 1) and line1_y in range(line2_start_y, line2_end_y):
-                point = [line2_x, line1_y]
-                cross_points.append(point)
+            return 1
         elif line2[0][1] == line2[1][1] and line1[0][0] == line1[1][0]:
-            line2_start_x = min(line2[0][0], line2[1][0])
-            line2_end_x = max(line2[0][0], line2[1][0])
-            line2_y = line2[0][1]
+            return 2
+        else:
+            return 0
 
-            line1_x = line1[0][0]
-            line1_start_y = min(line1[0][1], line1[1][1])
-            line1_end_y = max(line1[0][1], line1[1][1])
+    def cross_lines(self, line1, line2, cross_points):
+        line1_start_x = min(line1[0][0], line1[1][0])
+        line1_end_x = max(line1[0][0], line1[1][0])
+        line1_y = line1[0][1]
 
-            if line1_x in range(line2_start_x, line2_end_x + 1) and line2_y in range(line1_start_y, line1_end_y):
-                point = [line1_x, line2_y]
-                cross_points.append(point)
+        line2_x = line2[0][0]
+        line2_start_y = min(line2[0][1], line2[1][1])
+        line2_end_y = max(line2[0][1], line2[1][1])
+
+        if line2_x in range(line1_start_x, line1_end_x + 1) and line1_y in range(line2_start_y, line2_end_y):
+            point = [line2_x, line1_y]
+            cross_points.append(point)
 
     def make_wire(self, arr):
         wire = [[0,0]]
