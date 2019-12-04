@@ -10,10 +10,38 @@ class Wire():
 
     def cross(self, wire):
         cross_points = []
-        for point in self.wire:
-            if point in wire.wire:
-                cross_points.append(point)
+        for i in range(len(self.wire) - 1):
+            line1 = [self.wire[i], self.wire[i+1]]
+            for j in range(len(wire) - 1):
+                line2 = [wire[j], wire[j+1]]
+                self.cross_lines(line1, line2, cross_points)
         return cross_points
+
+    def cross_lines(self, line1, line2, cross_points):
+        if line1[0][1] == line1[1][1] and line2[0][0] == line2[1][0]:
+            line1_start_x = min(line1[0][0], line1[1][0])
+            line1_end_x = max(line1[0][0], line1[1][0])
+            line1_y = line1[0][1]
+
+            line2_x = line2[0][0]
+            line2_start_y = min(line2[0][1], line2[1][1])
+            line2_end_y = max(line2[0][1], line2[1][1])
+
+            if line2_x in range(line1_start_x, line1_end_x + 1) and line1_y in range(line2_start_y, line2_end_y):
+                point = [line2_x, line1_y]
+                cross_points.append(point)
+        elif line2[0][1] == line2[1][1] and line1[0][0] == line1[1][0]:
+            line2_start_x = min(line2[0][0], line2[1][0])
+            line2_end_x = max(line2[0][0], line2[1][0])
+            line2_y = line2[0][1]
+
+            line1_x = line1[0][0]
+            line1_start_y = min(line1[0][1], line1[1][1])
+            line1_end_y = max(line1[0][1], line1[1][1])
+
+            if line1_x in range(line2_start_x, line2_end_x + 1) and line2_y in range(line1_start_y, line1_end_y):
+                point = [line1_x, line2_y]
+                cross_points.append(point)
 
     def make_wire(self, arr):
         wire = [[0,0]]
@@ -25,31 +53,27 @@ class Wire():
         return wire
 
     def go_down(self, wire, position, value):
-        for i in range (1, value + 1):
-            position[1] -= 1
-            tmp_pos = [position[0], position[1]]
-            wire.append(tmp_pos)
+        position[1] -= value
+        tmp_pos = [position[0], position[1]]
+        wire.append(tmp_pos)
         return position
 
     def go_up(self, wire, position, value):
-        for i in range (1, value + 1):
-            position[1] += 1
-            tmp_pos = [position[0], position[1]]
-            wire.append(tmp_pos)
+        position[1] += value
+        tmp_pos = [position[0], position[1]]
+        wire.append(tmp_pos)
         return position
 
     def go_left(self, wire, position, value):
-        for i in range (1, value + 1):
-            position[0] -= 1
-            tmp_pos = [position[0], position[1]]
-            wire.append(tmp_pos)
+        position[0] -= value
+        tmp_pos = [position[0], position[1]]
+        wire.append(tmp_pos)
         return position
 
     def go_right(self, wire, position, value):
-        for i in range (1, value + 1):
-            position[0] += 1
-            tmp_pos = [position[0], position[1]]
-            wire.append(tmp_pos)
+        position[0] += value
+        tmp_pos = [position[0], position[1]]
+        wire.append(tmp_pos)
         return position
 
     def __getitem__(self, position):
@@ -70,7 +94,6 @@ def main():
             for elem in tmp:
                 path.append(elem)
             paths.append(path)
-
     wire1 = Wire(paths[0])
     wire2 = Wire(paths[1])
     cross_points = wire1.cross(wire2)
