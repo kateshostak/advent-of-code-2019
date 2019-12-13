@@ -30,12 +30,16 @@ def print_image(image, l, w):
     for i in range(w):
         for j in range(l):
             pixel = image[i][j]
-            if pixel == 1:
-                print('#', end='')
+            if j != l-1:
+                if pixel == 1:
+                    print('#', end='')
+                else:
+                    print(' ', end='')
             else:
-                print(' ', end='')
-        print('\n')
-
+                if pixel == 1:
+                    print('#')
+                else:
+                    print(' ')
 
 def main():
     arr = get_input()
