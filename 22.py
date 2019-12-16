@@ -18,7 +18,7 @@ class Robot():
     def __init__(self, start):
         self.painting = {}
         self.position = point(*start)
-        self.painting[self.position] = 0
+        self.painting[self.position] = 1
         self.direction = 0
 
     def paint(self, color):
@@ -78,19 +78,30 @@ def main():
     start = [0, 0]
     robot = Robot(start)
     to_exit = 'Pause'
+    canvas = [['0' for _ in range(70)] for _ in range(70)]
+    center = (27, 27)
     while to_exit != 'Stop':
         current_color = robot.get_color()
+        i = center[0] + robot.position.x
+        j = center[1] + robot.position.y
         INPUTS.append(current_color)
         to_exit = intcode.compute()
         if OUTPUTS:
             color = OUTPUTS.pop(0)
         else:
             break
+        canvas[i][j] = color
         to_exit = intcode.compute()
         direction = OUTPUTS.pop(0)
         robot.paint(color)
         robot.step(direction)
 
-    print(len(robot.painting))
+    for i in range(70):
+        for j in range(70):
+            if j == 69:
+                print(canvas[i][j])
+            else:
+                print(canvas[i][j], end='')
+
 if __name__ == '__main__':
     main()
