@@ -1,3 +1,5 @@
+import pdb
+
 def store_input(INPUTS):
     return INPUTS.pop(0)
 
@@ -10,7 +12,8 @@ class Memmory():
     OPCODE_TO_FUNC = {
             99: 'halt_',
             1: 'add_',
-            2: 'mult_', 3: 'store_input',
+            2: 'mult_',
+            3: 'store_input',
             4: 'print_output',
             5: 'jump_if_true',
             6: 'jump_if_false',
@@ -35,6 +38,10 @@ class Memmory():
             modes = params//100
             opcode = params % 100
             to_exit = self.execute(opcode, modes)
+        if opcode == 99:
+            return 'Stop'
+        else:
+            return 'Pause'
 
     def execute(self, opcode, modes):
         func = Memmory.OPCODE_TO_FUNC[opcode]
@@ -44,14 +51,11 @@ class Memmory():
     def get_value(self, i, mode):
         if mode == 0:
             ind = self.prog.get_value(i)
-            #return self.prog.get_value(ind)
             return ind
         elif mode == 1:
-            #return self.prog.get_value(i)
             return i
         elif mode == 2:
             ind = self.prog.get_value(i) + self.base
-            #return self.prog.get_value(ind)
             return ind
 
     def halt_(self, modes):
@@ -60,7 +64,6 @@ class Memmory():
     def add_(self, modes):
         i = self.get_value(self.position + 1, self.get_mode(modes, 0))
         j = self.get_value(self.position + 2, self.get_mode(modes, 1))
-        #k = self.prog.get_value(self.position + 3)
         k = self.get_value(self.position + 3, self.get_mode(modes, 2))
         a = self.prog.get_value(i)
         b = self.prog.get_value(j)
@@ -77,7 +80,6 @@ class Memmory():
     def mult_(self, modes):
         i = self.get_value(self.position + 1, self.get_mode(modes, 0))
         j = self.get_value(self.position + 2,self.get_mode(modes, 1))
-        #k = self.prog.get_value(self.position + 3)
         k = self.get_value(self.position + 3, self.get_mode(modes, 2))
         a = self.prog.get_value(i)
         b = self.prog.get_value(j)
@@ -86,18 +88,19 @@ class Memmory():
         return False
 
     def store_input(self, modes):
-        inpt = self.input_()
+        print('Input:')
+        inpt = self.input_(self.inputs)
         ind = self.get_value(self.position + 1, self.get_mode(modes, 0))
         self.prog.set_value(ind, int(inpt))
         self.position += 2
         return False
 
     def print_output(self, modes):
-        i = self.get_value(self.position + 1,self.get_mode(modes, 0) )
+        i = self.get_value(self.position + 1, self.get_mode(modes, 0))
         a = self.prog.get_value(i)
-        self.print_(a)
+        self.print_(a, self.outputs)
         self.position += 2
-        return False
+        return True
 
     def jump_if_true(self, modes):
         i = self.get_value(self.position + 1, self.get_mode(modes, 0))
@@ -124,7 +127,6 @@ class Memmory():
     def less_than(self, modes):
         i = self.get_value(self.position + 1, self.get_mode(modes, 0))
         j = self.get_value(self.position + 2, self.get_mode(modes, 1))
-        #k = self.prog.get_value(self.position + 3)
         a = self.prog.get_value(i)
         b = self.prog.get_value(j)
         k = self.get_value(self.position + 3, self.get_mode(modes, 2))
@@ -138,7 +140,6 @@ class Memmory():
     def equals(self, modes):
         i = self.get_value(self.position + 1, self.get_mode(modes, 0))
         j = self.get_value(self.position + 2, self.get_mode(modes, 1))
-        #k = self.prog.get_value(self.position + 3)
         a = self.prog.get_value(i)
         b = self.prog.get_value(j)
         k = self.get_value(self.position + 3, self.get_mode(modes, 2))
@@ -157,8 +158,8 @@ class Memmory():
         return False
 
 
-def get_input_prog():
-    with open('17.txt') as f:
+def get_input_prog(name):
+    with open(name) as f:
         prog = f.read().strip().split(',')
         arr = [int(elem) for elem in prog]
     return arr
