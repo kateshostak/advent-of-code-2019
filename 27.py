@@ -1,7 +1,10 @@
+import time
+import pdb
 from Comp import Memmory
 from Comp import get_input_prog
 from prog import Prog
 from point import point
+
 
 def store_input(INPUTS):
     return INPUTS.pop(0)
@@ -10,41 +13,54 @@ def store_input(INPUTS):
 def print_output(i, OUTPUTS):
     OUTPUTS.append(i)
 
+
 class Canvas():
-    def __init__(self, columns, rows):
-        self.columns = columns
-        self.rows = rows
+    TILES = {
+            0: ' ',
+            1: '.',
+            2: '#',
+            3: '=',
+            4: '*'
+            }
 
-    def build_cnavas(self, arr):
-       pass
+    def __init__(self, arr):
+        self.canvas = self.build_canvas(arr)
+        self.columns = max(self.canvas)[0]
+        self.rows = max(self.canvas, key=lambda elem: elem[1])[1]
+        self.field = self.make_field()
+        self.update_field(self.canvas)
 
-    def draw_tile(self):
-        pass
+    def build_canvas(self, arr):
+        canvas = {}
+        for i in range(0, len(arr)-3, 3):
+            tile = arr[i:i+3]
+            x = tile[0]
+            y = tile[1]
+            type_ = tile[2]
+            tile_point = point(x, y)
+            canvas[tile_point] = Canvas.TILES[type_]
+        return canvas
 
-    def draw_canvas(self):
-        for tile in self.canvas:
-            pass
+    def make_field(self):
+        field = [[0 for _ in range(self.columns + 1)] for _ in range(self.rows + 1)]
+        return field
 
-def build_canvas(INPUTS):
-    canvas  = {}
-    count = 0
-    min_x = 0
-    max_x = 0
-    min_y = 0
-    max_y = 0
-    for i in range(0, len(INPUTS)-3, 3):
-        tile = INPUTS[i:i+3]
-        x = tile[0]
-        y = tile[1]
-        type_ = tile[2]
-        tile_point = point(x, y)
-        canvas[tile_point] = type_
-        if x > max_x:
-            max_x = x
-        if y > max_y:
-            max_y = y
+    def update_field(self, canvas):
+        for tile in canvas:
+            self.field[tile.y][tile.x] = self.canvas[tile]
 
-    return canvas, max_x, max_y
+    def draw_field(self):
+        for i in range(self.rows + 1):
+            for j in range(self.columns + 1):
+                if j == self.columns - 1:
+                    print(self.field[i][j])
+                else:
+                    print(self.field[i][j], end='')
+
+    def draw_canvas(self, arr):
+        canvas = self.build_canvas(arr)
+        self.update_field(canvas)
+        self.draw_field()
 
 def main():
     arr = get_input_prog('26.txt')
@@ -56,11 +72,14 @@ def main():
     intcode = Memmory(prog, input, print_output, INPUTS, OUTPUTS)
 
     to_exit = 'Resume'
+    canvas = None
     while to_exit != 'Stop':
         to_exit = intcode.compute()
         if to_exit == 'Input':
-            canvas, columns, rows = build_canvas(OUTPUTS)
-            print(columns, rows)
-
+            if not canvas:
+                canvas = Canvas(OUTPUTS)
+            canvas.draw_canvas(OUTPUTS)
+            print('\r', flush=True)
+            #time.sleep(0.1)
 if __name__ == '__main__':
     main()
