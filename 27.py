@@ -52,12 +52,13 @@ class Canvas():
     def draw_field(self):
         for i in range(self.rows + 1):
             for j in range(self.columns + 1):
-                if j == self.columns - 1:
+                if j == self.columns:
                     print(self.field[i][j])
                 else:
                     print(self.field[i][j], end='')
 
     def draw_canvas(self, arr):
+        #pdb.set_trace()
         canvas = self.build_canvas(arr)
         self.update_field(canvas)
         self.draw_field()
@@ -78,8 +79,14 @@ def main():
         if to_exit == 'Input':
             if not canvas:
                 canvas = Canvas(OUTPUTS)
-            canvas.draw_canvas(OUTPUTS)
+                canvas.draw_field()
+            else:
+                OUTPUTS = OUTPUTS[-6::]
+
+                canvas.draw_canvas(OUTPUTS)
+
             print('\r', flush=True)
             #time.sleep(0.1)
+
 if __name__ == '__main__':
     main()
