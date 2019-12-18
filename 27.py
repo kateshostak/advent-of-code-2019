@@ -32,25 +32,28 @@ class Canvas():
 
     def build_canvas(self, arr):
         canvas = {}
-        for i in range(0, len(arr)-3, 3):
+        for i in range(0, len(arr), 3):
             tile = arr[i:i+3]
             x = tile[0]
             y = tile[1]
             type_ = tile[2]
             tile_point = point(x, y)
-            canvas[tile_point] = Canvas.TILES[type_]
+            if x < 0:
+                canvas[tile_point] = type_
+            else:
+                canvas[tile_point] = Canvas.TILES[type_]
         return canvas
 
     def make_field(self):
-        field = [[0 for _ in range(self.columns + 1)] for _ in range(self.rows + 1)]
+        field = [[0 for _ in range(self.columns + 1)] for _ in range(self.rows + 2)]
         return field
 
     def update_field(self, canvas):
         for tile in canvas:
-            self.field[tile.y][tile.x] = self.canvas[tile]
+            self.field[tile.y][tile.x] = canvas[tile]
 
     def draw_field(self):
-        for i in range(self.rows + 1):
+        for i in range(self.rows + 2):
             for j in range(self.columns + 1):
                 if j == self.columns:
                     print(self.field[i][j])
@@ -58,7 +61,6 @@ class Canvas():
                     print(self.field[i][j], end='')
 
     def draw_canvas(self, arr):
-        #pdb.set_trace()
         canvas = self.build_canvas(arr)
         self.update_field(canvas)
         self.draw_field()
@@ -74,18 +76,18 @@ def main():
 
     to_exit = 'Resume'
     canvas = None
+    i = 0
     while to_exit != 'Stop':
+
         to_exit = intcode.compute()
+
         if to_exit == 'Input':
             if not canvas:
                 canvas = Canvas(OUTPUTS)
                 canvas.draw_field()
             else:
-                OUTPUTS = OUTPUTS[-6::]
-
                 canvas.draw_canvas(OUTPUTS)
-
-            print('\r', flush=True)
+        #print('\r', flush=True)
             #time.sleep(0.1)
 
 if __name__ == '__main__':
