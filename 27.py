@@ -69,57 +69,18 @@ def main():
     arr = get_input_prog('26.txt')
     prog = Prog(arr)
 
-    INPUTS = [1]
+    INPUTS = []
     OUTPUTS = []
     prog.set_value(0, 2)
-    intcode = Memmory(prog, store_input, print_output, INPUTS, OUTPUTS)
+    intcode = Memmory(prog, input, print_output, INPUTS, OUTPUTS)
 
     to_exit = 'Resume'
     canvas = None
-    score_arr = []
-    score = 0
-    i = 1
-    while to_exit != 'Input':
+    while to_exit != 'Stop':
         to_exit = intcode.compute()
-
-    while True:
-        intcode = Memmory(prog, store_input, print_output, INPUTS, OUTPUTS)
-        to_exit = intcode.compute()
-        while to_exit != 'Stop':
-            i += 1
-            INPUTS.append(0)
-            to_exit = intcode.compute()
-            ind = OUTPUTS.index(-1)
-            score = OUTPUTS[ind+2]
-            score_arr.append(score)
-
-        INPUTS = INPUTS[:len(INPUTS) - 4]
-        if not canvas:
+        if len(OUTPUTS)%3 == 0:
             canvas = Canvas(OUTPUTS)
             canvas.draw_field()
-        else:
-            canvas.draw_canvas(OUTPUTS)
-            print(f'SCORE::{max(score_arr)}')
-
-        while to_exit != 'Stop':
-            i += 1
-            INPUTS.append(1)
-            to_exit = intcode.compute()
-            ind = OUTPUTS.index(-1)
-            score = OUTPUTS[ind+2]
-            score_arr.append(score)
-
-        INPUTS = INPUTS[:len(INPUTS) - 4]
-
-        if not canvas:
-            canvas = Canvas(OUTPUTS)
-            canvas.draw_field()
-        else:
-            canvas.draw_canvas(OUTPUTS)
-            print(f'SCORE::{max(score_arr)}')
-
-        #print('\r', flush=True)
-            #time.sleep(0.1)
 
 if __name__ == '__main__':
     main()
