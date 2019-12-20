@@ -1,7 +1,5 @@
 import pdb
 import sys
-import asyncio
-import time
 from Comp import Memmory
 from Comp import get_input_prog
 from prog import Prog
@@ -70,39 +68,89 @@ class Canvas():
         self.draw_field()
 
 
-def user_input(INPUTS):
-    inpt = sys.stdin.read(1)
-    if inpt == 'a':
-        INPUTS.append(-1)
-    if inpt == 'd':
-        INPUTS.append(1)
+def handle_input(INPUTS):
+    if INPUTS:
+        return INPUTS.pop(0)
     else:
-        INPUTS.append(0)
+        inpt = sys.stdin.readline().strip()
+        if not inpt:
+            tmp_input.append(0)
+            return 0
+        i = 0
+        while i < len(inpt):
+            if inpt[i] == '-':
+                tmp_input.append(-1)
+                i += 1
+                INPUTS.append(-1)
+            else:
+                tmp_input.append(int(inpt[i]))
+                INPUTS.append(int(inpt[i]))
+            i += 1
+        return INPUTS.pop(0)
+
+def purge_inputs(inputs):
+    while inputs:
+        inputs.pop(0)
+
+def get_max_score(name):
+    with open(name, 'r') as f:
+        return int(f.readline().strip())
+
+def get_best_seq(name):
+    seq = []
+    with open(name, 'r') as f:
+        inpt = f.read().strip()
+        i = 0
+        while i < len(inpt):
+            if inpt[i] == '-':
+                seq.append(-1)
+                i += 1
+            else:
+                seq.append(int(inpt[i]))
+            i += 1
+    return seq
+
+tmp_input = get_best_seq('bestseq.txt')
 
 def main():
     arr = get_input_prog('26.txt')
-    prog = Prog(arr)
-
-    INPUTS = []
-    OUTPUTS = []
-    prog.set_value(0, 2)
-    intcode = Memmory(prog, store_input, print_output, INPUTS, OUTPUTS)
-
-    to_exit = 'Resume'
     canvas = None
-    loop = asyncio.get_event_loop()
-    loop.add_reader(sys.stdin, user_input, INPUTS)
+    max_score = get_max_score('maxscore.txt')
+    INPUTS = get_best_seq('bestseq.txt')
+    OUTPUTS = []
+    score = 0
+    score_arr = []
+    to_exit = 'Resume'
+    prog = Prog(arr)
+    prog.set_value(0, 2)
+    intcode = Memmory(prog, handle_input, print_output, INPUTS, OUTPUTS)
     while to_exit != 'Stop':
-        to_exit = loop.run_until_complete(intcode.compute())
+        to_exit = intcode.compute()
+        if len(OUTPUTS) > 2282:
+            if len(OUTPUTS)%3 == 0:
+                canvas = Canvas(OUTPUTS)
+                score = canvas.canvas[point(-1,0)]
+                score_arr.append(score)
+                print(score)
+                if score >= 10200:
+                    canvas.draw_field()
+    score = max(score_arr)
+    if score >= max_score:
 
-        if len(OUTPUTS)%3 == 0:
-            canvas = Canvas(OUTPUTS)
-            if to_exit == 'Input':
-                canvas.draw_field()
-                time.sleep(0.1)
-                canvas1 = Canvas(OUTPUTS)
-                canvas1.draw_field()
-            if len(OUTPUTS) > 2283:
-                time.sleep(0.1)
+        print(f'max_score::{max_score}')
+        max_score = score
+        with open('maxscore.txt', 'w') as f:
+            f.write(f'{max_score}')
+        with open('seq.txt', 'w') as f:
+            f.write(f'{score}::')
+            for elem in tmp_input:
+                f.write(str(elem))
+        with open('progstate.txt', 'w') as f:
+            for key, value in prog.prog.items():
+                f.write(f'{elem},')
+        with open('out.txt', 'w') as f:
+            for elem in OUTPUTS:
+                f.write(f'{elem},')
+
 if __name__ == '__main__':
     main()
