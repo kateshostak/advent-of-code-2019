@@ -1,84 +1,107 @@
-import pdb
 from collections import namedtuple
 
 
-def block(arr2, point, step_j, step_i, columns, rows):
-    i = point.row + step_i
-    j = point.column + step_j
-    if step_i > 0 and step_j > 0:
-        while i < rows and j < columns:
-            arr2[i][j] = 'o'
-            i += step_i
-            j += step_j
-    elif step_i < 0 and step_j > 0:
-        while i > rows and j < columns:
-            arr2[i][j] = 'o'
-            i += step_i
-            j += step_j
-    elif step_i > 0 and step_j < 0:
-        while i < rows and j > columns:
-            arr2[i][j] = 'o'
-            i += step_i
-            j += step_j
+def block2(arr, point, dx, dy):
+    y = point.y + dy//abs(dy)
+
+    if dy > 0 and dx > 0:
+        while y < len(arr):
+            x = point.x + dx//abs(dx)
+            while x < len(arr[0]):
+                dx2 = x - point.x
+                dy2 = y - point.y
+                if dx2*dy == dy2*dx:
+                    arr[y][x] = 'o'
+                x += dx//abs(dx)
+            y += dy//abs(dy)
+    elif dy < 0 and dx > 0:
+        while y > -1:
+            x = point.x + dx//abs(dx)
+            while x < len(arr[0]):
+                dx2 = x - point.x
+                dy2 = y - point.y
+                if dx2*dy == dy2*dx:
+                    arr[y][x] = 'o'
+                x += dx//abs(dx)
+            y += dy//abs(dy)
+    elif dy > 0 and dx < 0:
+        while y < len(arr):
+            x = point.x + dx//abs(dx)
+            while x > -1:
+                dx2 = x - point.x
+                dy2 = y - point.y
+                if dx2*dy == dy2*dx:
+                    arr[y][x] = 'o'
+                x += dx//abs(dx)
+            y += dy//abs(dy)
     else:
-        while i > rows and j > columns:
-            arr2[i][j] = 'o'
-            i += step_i
-            j += step_j
+        while y > -1:
+            x = point.x + dx//abs(dx)
+            while x > -1:
+                dx2 = x - point.x
+                dy2 = y - point.y
+                if dx2*dy == dy2*dx:
+                    arr[y][x] = 'o'
+                x += dx//abs(dx)
+            y += dy//abs(dy)
 
 
 def count_asteroids(arr, point):
-    as1 = count_quarter(arr, point, 1, -1, len(arr[0]), -1)
-    as2 = count_quarter(arr, point, -1, -1, -1, -1)
-    as3 = count_quarter(arr, point, -1, 1, -1, len(arr))
-    as4 = count_quarter(arr, point, 1, 1, len(arr[0]), len(arr))
-    as5 = count_cross(arr, point)
-    return as1 + as2 + as3 + as4 + as5
+    upper_right = count_quarter(arr, point, 1, -1, len(arr[0]), -1)
+    upper_left = count_quarter(arr, point, -1, -1, -1, -1)
+    lower_left = count_quarter(arr, point, -1, 1, -1, len(arr))
+    lower_right = count_quarter(arr, point, 1, 1, len(arr[0]), len(arr))
+    cross = count_cross(arr, point)
+    return upper_right + upper_left + lower_right + lower_left + cross
 
 
 def count_cross(arr, point):
     asteroids = 0
-    for j in range(point.column + 1, len(arr[0])):
-        if arr[point.row][j] == '#':
+    for j in range(point.x + 1, len(arr[0])):
+        if arr[point.y][j] == '#':
             asteroids += 1
-            break
+            for k in range(j + 1, len(arr[0])):
+                arr[point.y][k] = '0'
 
-    for j in range(point.column - 1, -1, -1):
-        if arr[point.row][j] == '#':
+    for j in range(point.x - 1, -1, -1):
+        if arr[point.y][j] == '#':
             asteroids += 1
-            break
+            for k in range(j - 1, -1, -1):
+                arr[point.y][k] = '0'
 
-    for i in range(point.row+ 1, len(arr)):
-        if arr[i][point.column] == '#':
+    for i in range(point.y + 1, len(arr)):
+        if arr[i][point.x] == '#':
             asteroids += 1
-            break
+            for k in range(i + 1, len(arr)):
+                arr[k][point.x] = '0'
 
-    for i in range(point.row - 1, -1, -1):
-        if arr[i][point.column] == '#':
+    for i in range(point.y - 1, -1, -1):
+        if arr[i][point.x] == '#':
             asteroids += 1
-            break
+            for k in range(i - 1, -1, -1):
+                arr[k][point.x] = '0'
 
     return asteroids
 
 
-def count_quarter(arr, point, step_column, step_row, columns, rows):
+def count_quarter(arr, point, step_x, step_y, columns, rows):
     asteroids = 0
-    row = point.row + step_row
-    while row != rows:
-        column = point.column + step_column
-        while column != columns:
-            if arr[row][column] == '#':
+    y = point.y + step_y
+    while y != rows:
+        x = point.x + step_x
+        while x != columns:
+            if arr[y][x] == '#':
                 asteroids += 1
-                step_i = row - point.row
-                step_j = column - point.column
-                block(arr, point, step_j, step_i, columns, rows)
-            column  += step_column
-        row += step_row
+                dy = y - point.y
+                dx = x - point.x
+                block2(arr, point, dx, dy)
+            x += step_x
+        y += step_y
     return asteroids
 
 
 def find_best_asteroid(arr):
-    point = namedtuple('Point', ['row', 'column'])
+    point = namedtuple('Point', ['y', 'x'])
     asteroids = {}
     for i in range(len(arr)):
         for j in range(len(arr[0])):
@@ -86,45 +109,29 @@ def find_best_asteroid(arr):
                 arr1 = []
                 for row in arr:
                     arr1.append(row.copy())
-                ast = point(i,j)
+                ast = point(i, j)
                 asteroids[ast] = count_asteroids(arr1, ast)
-    #return max(asteroids, key=lambda elem: asteroids[elem])
     return asteroids
 
 
 def main():
-    #point = namedtuple('Point', ['row', 'column'])
-    #a = point(0, 3)
-    arr = [
-            ['#', 'x', 'x', 'x'],
-            ['x', '#', '#', '#'],
-            ['x', '#', '#', 'x'],
-            ['x', 'x', 'x', 'x']
-            ]
-    arr = [
-            ['.', '#', '.', '.', '#'],
-            ['.', '.', '.', '.', '.'],
-            ['#', '#', '#', '#', '#'],
-            ['.', '.', '.', '.', '#'],
-            ['.', '.', '.', '#', '#']
-            ]
-
-    #arr[a.row][a.column] = '*'
-    #as4 = count_quarter(arr, a, 1, 1, len(arr[0]), len(arr))
-    #as1 = count_quarter(arr, a, 1, -1, len(arr[0]), -1)
-    #as2 = count_quarter(arr, a, -1, -1, -1, -1)
-    #as3 = count_quarter(arr, a, -1, 1, -1, len(arr))
-
-    #for row in arr:
-        #print(*row) # noqa
+    arr = []
+    with open('20.txt', 'r') as f:
+        for line in f.readlines():
+            row = []
+            for elem in line.strip():
+                row.append(elem)
+            arr.append(row)
 
     astr = find_best_asteroid(arr)
-    for key, value in astr.items():
-        a = key
-        arr[a.row][a.column] = value
+    max_astr = max(astr, key=lambda elem: astr[elem])
+    print(max_astr, astr[max_astr])
 
-    for row in arr:
-        print(*row)
+    # point = namedtuple('Point', ['x', 'y'])
+    # a = point(0, 4)
+    # arr[4][0] = 'X'
+    # print(count_asteroids(arr, a))
+
 
 if __name__ == '__main__':
     main()
