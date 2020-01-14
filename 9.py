@@ -68,8 +68,8 @@ class Memmory():
         return False
 
     def print_output(self, modes):
-        ind = self.prog[self.position + 1]
-        print(self.prog[ind])
+        i = self.get_value(self.position + 1, modes)
+        print(i)
         return False
 
 def find_res(n, arr, comp):
@@ -85,12 +85,17 @@ def find_res(n, arr, comp):
 def main():
     arr = []
     with open('9.txt') as f:
-        prog = f.read().split(',')
+        prog = f.read().strip().split(',')
         for elem in prog:
             arr.append(int(elem))
+    #arr = [3,0,4,0,99]
+    #arr = [1002,4,3,4,33]
+    #arr = [1101,100,-1,4,0]
     mycomp = Memmory()
     #pdb.set_trace()
+    #answer 11193703
     mycomp.compute(arr)
+
 
 if __name__ == '__main__':
     main()

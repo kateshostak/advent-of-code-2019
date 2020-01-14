@@ -1,5 +1,3 @@
-import pdb
-
 def store_input(INPUTS):
     return INPUTS.pop(0)
 
@@ -40,8 +38,10 @@ class Memmory():
             to_exit = self.execute(opcode, modes)
         if opcode == 99:
             return 'Stop'
-        else:
-            return 'Pause'
+        elif opcode == 4:
+            return 'Output'
+        elif opcode == 3:
+            return 'Input'
 
     def execute(self, opcode, modes):
         func = Memmory.OPCODE_TO_FUNC[opcode]
@@ -88,12 +88,11 @@ class Memmory():
         return False
 
     def store_input(self, modes):
-        print('Input:')
         inpt = self.input_(self.inputs)
         ind = self.get_value(self.position + 1, self.get_mode(modes, 0))
         self.prog.set_value(ind, int(inpt))
         self.position += 2
-        return False
+        return True
 
     def print_output(self, modes):
         i = self.get_value(self.position + 1, self.get_mode(modes, 0))

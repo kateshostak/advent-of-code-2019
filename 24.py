@@ -5,6 +5,7 @@ class Moon():
     def __init__(self, coor, velocity):
         self.position = coor
         self.velocity = velocity
+        self.orbit = [self.position]
 
     def get_pot_energy(self):
         return sum([abs(elem) for elem in self.position])
@@ -26,10 +27,10 @@ class Moon():
     def update_position(self):
         for i in range(len(self.position)):
             self.position[i] += self.velocity[i]
+        self.orbit.append(self.position)
 
     def __repr__(self):
         return f'position::{self.position}, velocity::{self.velocity}'
-
 
 
 class System():
@@ -60,15 +61,15 @@ class System():
 def main():
     moons = [[15, -2, -6], [-5, -4, -11], [0, -6, 0], [5, 9, 6]]
     velocities = [[0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
-    #moons = [[-1, 0, 2], [2, -10, -7], [4, -8, 8], [3, 5, -1]]
+    moons = [[-1, 0, 2], [2, -10, -7], [4, -8, 8], [3, 5, -1]]
     #moons = [[-8, -10, 0], [5, 5, 10], [2, -7, 3], [9, -8, -3]]
     my_system = System()
     for moon, velocity in zip(moons, velocities):
         my_system.add_moon(moon, velocity)
 
-    for i in range(1000):
+    for i in range(100):
         my_system.step()
-
+    rows = max(my_system)
     print(my_system.get_total_energy())
 
 if __name__ == '__main__':

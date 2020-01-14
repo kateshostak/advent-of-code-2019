@@ -16,3 +16,9 @@ class Prog():
             return self.prog[key]
         else:
             return 0
+
+    def get_prog_arr(self):
+        arr = []
+        for key, value in self.prog.items:
+            arr.append(value)
+        return arr

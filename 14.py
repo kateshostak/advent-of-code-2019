@@ -1,5 +1,6 @@
 import pdb
 import itertools
+import Comp
 
 INPUTS = []
 OUTPUTS = []
@@ -203,7 +204,7 @@ def purge_inputs():
         INPUTS.pop(0)
 
 def make_amplifier_arr(n, arr):
-    return [Memmory(arr) for i in range(n)]
+    return [Comp.Memmory(arr, Comp.store_input, Comp.print_output, INPUTS, OUTPUTS) for i in range(n)]
 
 
 def main():

@@ -1,11 +1,8 @@
-import pdb
-
 def count_passwords(start, end):
     count = 0
     for k in range(start, end + 1):
         passwrd = str(k)
         if is_non_decreasing(passwrd):
-       #     pdb.set_trace()
             for i in range(10):
                 if find_substr(i, passwrd) == 2:
                     count += 1
@@ -28,6 +25,7 @@ def is_non_decreasing(passwrd):
 
 def main():
     start, end = 347312, 805915
+    #start, end = 372037, 905157
     print(count_passwords(start, end))
 
 if __name__ == '__main__':
